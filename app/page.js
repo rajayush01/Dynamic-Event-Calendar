@@ -239,7 +239,7 @@ useEffect(() => {
               📥 Export
             </button>
             {isExportDropdownOpen && (
-              <div className="absolute mt-1 bg-white border rounded shadow-md">
+              <div className="absolute mt-1 bg-white border rounded shadow-md z-20">
                 <button
                   onClick={() => { exportEvents("json"); setIsExportDropdownOpen(false); }}
                   className="block px-4 py-2 w-full text-left hover:bg-gray-100"
