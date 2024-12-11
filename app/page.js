@@ -1,13 +1,13 @@
-"use client";
 import React, { useState, useEffect, useMemo } from "react";
 import dayjs from "dayjs";
-import Dexie from "dexie";
 import CalendarHeader from "./components/CalendarHeader";
 import CalendarGrid from "./components/CalendarGrid";
 import EventModal from "./components/EventModal";
 import EventList from "./components/EventList";
+import Dexie from "dexie";
 
-// Initialize Dexie Database
+
+
 const db = new Dexie("CalendarAppDB");
 db.version(1).stores({
   events: "day, eventList", // "day" is the primary key
@@ -37,31 +37,31 @@ const Calendar = () => {
     { label: "Others", value: "others", color: "#8B5CF6" },
   ];
 
-  // Load events from Dexie DB on mount
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const allEvents = await db.events.toArray();
-      const eventsObject = allEvents.reduce((acc, { day, eventList }) => {
-        acc[day] = eventList;
-        return acc;
-      }, {});
-      setEvents(eventsObject);
-    };
-    fetchEvents();
-  }, []);
+ // Load events from Dexie DB on mount
+ useEffect(() => {
+  const fetchEvents = async () => {
+    const allEvents = await db.events.toArray();
+    const eventsObject = allEvents.reduce((acc, { day, eventList }) => {
+      acc[day] = eventList;
+      return acc;
+    }, {});
+    setEvents(eventsObject);
+  };
+  fetchEvents();
+}, []);
 
-  // Save events to Dexie DB whenever `events` changes
-  useEffect(() => {
-    const saveEvents = async () => {
-      await db.events.clear();
-      const eventEntries = Object.entries(events).map(([day, eventList]) => ({
-        day,
-        eventList,
-      }));
-      await db.events.bulkPut(eventEntries);
-    };
-    saveEvents();
-  }, [events]);
+// Save events to Dexie DB whenever `events` changes
+useEffect(() => {
+  const saveEvents = async () => {
+    await db.events.clear();
+    const eventEntries = Object.entries(events).map(([day, eventList]) => ({
+      day,
+      eventList,
+    }));
+    await db.events.bulkPut(eventEntries);
+  };
+  saveEvents();
+}, [events]);
 
   const handlePrevMonth = () => setCurrentDate(currentDate.subtract(1, "month"));
   const handleNextMonth = () => setCurrentDate(currentDate.add(1, "month"));
@@ -79,21 +79,17 @@ const Calendar = () => {
         endTime: "",
         description: "",
         category: "personal",
-        color: CATEGORY_OPTIONS.find((c) => c.value === "personal").color,
+        color: CATEGORY_OPTIONS.find(c => c.value === "personal").color,
       });
       setIsModalOpen(true);
     }
   };
 
   const isEventOverlapping = (newEvent, existingEvents) => {
-    return existingEvents.some(
-      (event) =>
-        (newEvent.startTime >= event.startTime &&
-          newEvent.startTime < event.endTime) ||
-        (newEvent.endTime > event.startTime &&
-          newEvent.endTime <= event.endTime) ||
-        (newEvent.startTime <= event.startTime &&
-          newEvent.endTime >= event.endTime)
+    return existingEvents.some(event =>
+      (newEvent.startTime >= event.startTime && newEvent.startTime < event.endTime) ||
+      (newEvent.endTime > event.startTime && newEvent.endTime <= event.endTime) ||
+      (newEvent.startTime <= event.startTime && newEvent.endTime >= event.endTime)
     );
   };
 
@@ -108,9 +104,7 @@ const Calendar = () => {
       const dayEvents = newEvents[selectedDay] || [];
 
       if (isEventOverlapping(modalData, dayEvents)) {
-        alert(
-          "This event overlaps with an existing event. Please choose a different time."
-        );
+        alert("This event overlaps with an existing event. Please choose a different time.");
         return;
       }
 
@@ -128,15 +122,13 @@ const Calendar = () => {
     const updatedEvents = { ...events };
     const dayEvents = updatedEvents[selectedDay] || [];
 
-    const eventIndex = dayEvents.findIndex((e) => e.id === modalData.id);
+    const eventIndex = dayEvents.findIndex(e => e.id === modalData.id);
 
     if (eventIndex === -1) return;
 
-    const eventsToCheck = dayEvents.filter((e) => e.id !== modalData.id);
+    const eventsToCheck = dayEvents.filter(e => e.id !== modalData.id);
     if (isEventOverlapping(modalData, eventsToCheck)) {
-      alert(
-        "This event overlaps with an existing event. Please choose a different time."
-      );
+      alert("This event overlaps with an existing event. Please choose a different time.");
       return;
     }
 
@@ -151,7 +143,7 @@ const Calendar = () => {
 
   const handleDeleteEvent = (day, id) => {
     const newEvents = { ...events };
-    newEvents[day] = newEvents[day].filter((event) => event.id !== id);
+    newEvents[day] = newEvents[day].filter(event => event.id !== id);
 
     if (newEvents[day].length === 0) {
       delete newEvents[day];
@@ -165,11 +157,10 @@ const Calendar = () => {
 
     const filteredEventsResult = {};
 
-    Object.keys(events).forEach((day) => {
-      const dayEvents = events[day].filter(
-        (event) =>
-          event.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-          event.description.toLowerCase().includes(filterKeyword.toLowerCase())
+    Object.keys(events).forEach(day => {
+      const dayEvents = events[day].filter(event =>
+        event.name.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+        event.description.toLowerCase().includes(filterKeyword.toLowerCase())
       );
 
       if (dayEvents.length > 0) {
@@ -180,6 +171,36 @@ const Calendar = () => {
     return filteredEventsResult;
   }, [events, filterKeyword]);
 
+
+  const exportEvents = (format) => {
+    if (format === "json") {
+      const dataStr = JSON.stringify(events, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const exportFileName = `calendar-events-${currentDate.format('YYYY-MM')}.json`;
+
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileName);
+      linkElement.click();
+    } else if (format === "csv") {
+      let csvContent = "Day,Event Name,Start Time,End Time,Description,Category\n";
+
+      Object.keys(events).forEach(day => {
+        events[day].forEach(event => {
+          csvContent += `${day},"${event.name}",${event.startTime},${event.endTime},"${event.description}",${event.category}\n`;
+        });
+      });
+
+      const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+      const exportFileName = `calendar-events-${currentDate.format('YYYY-MM')}.csv`;
+
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileName);
+      linkElement.click();
+    }
+  };
+
   const resetModalData = () => {
     setModalData({
       id: "",
@@ -188,7 +209,7 @@ const Calendar = () => {
       endTime: "",
       description: "",
       category: "personal",
-      color: CATEGORY_OPTIONS.find((c) => c.value === "personal").color,
+      color: CATEGORY_OPTIONS.find(c => c.value === "personal").color,
     });
   };
 
@@ -208,6 +229,31 @@ const Calendar = () => {
             onChange={(e) => setFilterKeyword(e.target.value)}
             className="w-48 px-2 py-1 border rounded"
           />
+          <div className="relative">
+            <button
+              onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
+              className="p-2 border rounded hover:bg-gray-100"
+              title="Export Events"
+            >
+              📥 Export
+            </button>
+            {isExportDropdownOpen && (
+              <div className="absolute mt-1 bg-white border rounded shadow-md">
+                <button
+                  onClick={() => { exportEvents("json"); setIsExportDropdownOpen(false); }}
+                  className="block px-4 py-2 w-full text-left hover:bg-gray-100"
+                >
+                  Export as JSON
+                </button>
+                <button
+                  onClick={() => { exportEvents("csv"); setIsExportDropdownOpen(false); }}
+                  className="block px-4 py-2 w-full text-left hover:bg-gray-100"
+                >
+                  Export as CSV
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -216,7 +262,9 @@ const Calendar = () => {
         events={filteredEvents}
         handleDayClick={handleDayClick}
         selectedDay={selectedDay}
+        isSearchActive={!!filterKeyword}
       />
+
 
       {selectedDay && (
         <EventList
