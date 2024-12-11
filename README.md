@@ -1,5 +1,5 @@
 Dynamic Event Calendar 🗓️
-
+Live Link :- https://6759d35e8f0aff0008198f5f--dynamic-event-calendar.netlify.app/
 Features:-
 
 📅 Full month calendar view
@@ -17,7 +17,7 @@ Setup and Installation
 
 Clone the repository
 
-git clone https://github.com/yourusername/dynamic-event-calendar.git
+git clone https://github.com/rajayush01/Dynamic-Event-Calendar.git
 cd dynamic-event-calendar
 
 Install dependencies
@@ -37,15 +37,15 @@ Calendar Management
 
 Event Management
 
-1. Click on any day to add an event
-2. Edit or delete existing events
-3. Add details like:
+1. Double click on any day to add an event
+2. Single Click to view the events on that day
+3. Edit or delete existing events
+4. Add details like:
 
-I. Event name
-II. Start and end times
-III. Optional description
-IV. Event color
-
+  I. Event name
+  II. Start and end times
+  III. Optional description
+  IV. Event color
 
 
 Advanced Capabilities
@@ -59,7 +59,7 @@ Advanced Capabilities
 Bonus Features
 
 1. Event color coding
-2. CSV export
+2. CSV and JSON export
 
 Contributing
 
