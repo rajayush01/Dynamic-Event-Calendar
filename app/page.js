@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect, useMemo } from "react";
 import dayjs from "dayjs";
 import CalendarHeader from "./components/CalendarHeader";
