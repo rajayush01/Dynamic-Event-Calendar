@@ -1,5 +1,5 @@
 Dynamic Event Calendar 🗓️
-Live Link :- https://6759d35e8f0aff0008198f5f--dynamic-event-calendar.netlify.app/
+Live Link :- https://dynamic-event-calendar.netlify.app/
 Features:-
 
 📅 Full month calendar view
